@@ -19,15 +19,14 @@ from langchain_core.documents import Document
 from langgraph.graph import StateGraph, END
 import re
 import ast
-from dotenv import load_dotenv
-load_dotenv()
+
 # Suppress warnings
 warnings.filterwarnings('ignore')
 
 # Set environment variables
-os.environ['OPENAI_API_KEY'] = os.getenv('OPENAI_API_KEY')
-os.environ['TAVILY_API_KEY'] = os.getenv('TAVILY_API_KEY')
-os.environ["WOLFRAM_ALPHA_APPID"] = os.getenv('WOLFRAM_ALPHA_APPID')
+os.environ['OPENAI_API_KEY'] = "YOUR_API_KEY"
+os.environ['TAVILY_API_KEY'] = "YOUR_API_KEY"
+os.environ["WOLFRAM_ALPHA_APPID"] = "YOUR_API_KEY"
 
 # Apply nest_asyncio
 nest_asyncio.apply()
@@ -64,10 +63,8 @@ def video_tool(query:str) -> str:
     If user want to find some information, this tool is good to gather youtube video information.
     query should be given in string format.
     """
-    #query에 해당하는 Youtube 비디오 URL 가져오기
     urls = youtube_search_tool.run(query)
     urls = ast.literal_eval(urls)
-    #URL 순회하면서 Document 객체에 내용 담기
     docs = []
     for url in urls:
         loader = YoutubeLoader.from_youtube_url(
@@ -82,7 +79,6 @@ def video_tool(query:str) -> str:
         doc = Document(page_content=script_content, metadata={"source": url, "title":title, "author":author})
         docs.append(doc)
 
-    #모든 비디오의 내용을 벡터DB에 담기
     text_splitter = RecursiveCharacterTextSplitter(
         separators  = ["\n\n", "\n", ".", ",", " ", ""],
         chunk_size=1000, 
