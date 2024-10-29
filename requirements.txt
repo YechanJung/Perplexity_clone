@@ -1,0 +1,14 @@
+streamlit
+nest_asyncio
+typing-extensions
+langgraph
+langchain-community
+langchain-core
+langchain-chroma
+langchain-openai
+langchain-text-splitters
+pytube
+youtube-search
+youtube-transcript-api
+wolframalpha
+

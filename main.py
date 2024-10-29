@@ -13,30 +13,29 @@ from langgraph.prebuilt import ToolNode
 from langchain_community.utilities.wolfram_alpha import WolframAlphaAPIWrapper
 from langchain_chroma import Chroma
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
+# from langchain_community.chat_models import ChatOllama
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import YoutubeLoader
 from langchain_core.documents import Document
 from langgraph.graph import StateGraph, END
 import re
 import ast
+from dotenv import load_dotenv
 
-# Suppress warnings
+load_dotenv()
+
 warnings.filterwarnings('ignore')
 
-# Set environment variables
-os.environ['OPENAI_API_KEY'] = "YOUR_API_KEY"
-os.environ['TAVILY_API_KEY'] = "YOUR_API_KEY"
-os.environ["WOLFRAM_ALPHA_APPID"] = "YOUR_API_KEY"
+os.environ['OPENAI_API_KEY'] = os.getenv('OPENAI_API_KEY')
+os.environ['TAVILY_API_KEY'] = os.getenv('TAVILY_API_KEY')
+os.environ["WOLFRAM_ALPHA_APPID"] = os.getenv("WOLFRAM_ALPHA_APPID")
 
-# Apply nest_asyncio
 nest_asyncio.apply()
 
-# Define State class
 class State(TypedDict):
     messages: Annotated[list, add_messages]
     focus: Literal["web", "academic", "video", "math"]
 
-# Define tools
 web_tool = TavilySearchResults(max_results=2)
 
 @tool
@@ -107,7 +106,6 @@ def video_tool(query:str) -> str:
         """
         video_results.append(video_info)
 
-    # Join all video results into a single string
     all_video_results = "\n\n".join(video_results)
 
     return all_video_results
@@ -120,14 +118,13 @@ tools = {
 }
 tool_nodes = {focus: ToolNode(tools[focus]) for focus in tools}
 
-# Define chatbot function
 llm = ChatOpenAI(model="gpt-4o-mini")
+# llm = ChatOllama(model="llama3.1:70b")
 def chatbot(state: State):
     llm_with_tools = llm.bind_tools(tools[state["focus"]])
     result = llm_with_tools.invoke(state["messages"])
     return {"messages": [result]}
 
-# Build graph
 graph_builder = StateGraph(State)
 graph_builder.add_node("chatbot", chatbot)
 
