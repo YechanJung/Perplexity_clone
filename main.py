@@ -153,14 +153,11 @@ for focus in tools:
 graph_builder.set_entry_point("chatbot")
 graph = graph_builder.compile()
 
-# Streamlit app
 st.title("Perplexity")
 
-# Initialize session state
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# Focus area selection using checkboxes
 st.header("Focus")
 focus_areas = {
     "Web Search": "web",
@@ -173,21 +170,17 @@ for area, key in focus_areas.items():
     if st.checkbox(area, key=f"checkbox_{key}"):
         selected_focus.append(key)
 
-# Display chat messages
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-# Chat input
 if prompt := st.chat_input("Type your message here"):
     if not selected_focus:
         st.warning("Please select at least one focus area.")
     else:
-        # Add user message to chat history
         st.session_state.messages.append({"role": "user", "content": prompt})
         st.chat_message("user").markdown(prompt)
 
-        # Process the query for each selected focus area
         with st.status("Processing your request...", expanded=True) as status:
             responses = []
             for focus in selected_focus:
@@ -202,13 +195,11 @@ if prompt := st.chat_input("Type your message here"):
             
             status.update(label="Processing complete!", state="complete", expanded=False)
 
-        # Display assistant responses outside the status
         for focus, response in responses:
             response_with_focus = f"[{focus.upper()} SEARCH]\n\n{response}"
             st.session_state.messages.append({"role": "assistant", "content": response_with_focus})
             st.chat_message("assistant").markdown(response_with_focus)
 
-# Clear chat button
 if st.button("Clear Chat"):
     st.session_state.messages = []
     st.rerun()
