@@ -2,6 +2,8 @@
 
 ### 1. 환경 설정
 
+python version >> 3.10
+
 ```bash
 pip install -r requirements.txt
 ```
